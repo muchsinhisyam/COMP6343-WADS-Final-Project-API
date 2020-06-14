@@ -20,6 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 // Register and Login
 Route::post('register', 'API\RegisterController@register');
-Route::group(['middleware' => ['web']], function () {
-    Route::post('login', 'API\LoginController@login');
-});
+Route::post('login', 'API\LoginController@login');

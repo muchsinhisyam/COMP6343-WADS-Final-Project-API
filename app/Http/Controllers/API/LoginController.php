@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
-class LoginController extends Controller
+class LoginController extends BaseController
 {
     public $successStatus = 200;
 
@@ -21,8 +21,7 @@ class LoginController extends Controller
             //     return redirect()->intended('admin'); //redirect to admin panel
             // }
             // return redirect()->intended('/');
-
-            return response()->json(['success' => $success], $this->successStatus);
+            return $this->sendResponse($user, 'User login successfully.');
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
