@@ -29,39 +29,6 @@ class AdminController extends Controller
         return view('admin-page/dashboard');
     }
 
-    public function create(Request $request)
-    {
-        $validatedData  =  $request->validate([
-            'product_name'  => 'required|max:255',
-            'category_id' => 'required',
-            'color_id' => 'required',
-            'price' => 'required|digits_between:0,2147483646|numeric',
-            'qty' => 'required|digits_between:0,2147483646|numeric',
-            'description' => 'required|max:255'
-            // Photo Size need to be limited
-        ]);
-
-        $input = $request->all();
-
-        $id = Product::create($input)->id;
-        $iteration = 1;
-        // if ($request->hasFile('file')) {
-        foreach ($request->file as $file) {
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'ProductID-' . $id . '-Image-' . $iteration . '.' . $extension;
-            $path = public_path() . '/images';
-            $file->move($path, $filename);
-            $photo = new \App\Photos;
-            $photo->product_id = $id;
-            $photo->image_name = $filename;
-            $photo->save();
-
-            $iteration++;
-        }
-        // }
-        return redirect('/admin/products')->with('success', 'Product successfully added');
-    }
-
     public function insert_product_photo(Request $request)
     {
         // if ($request->hasFile('file')) {
@@ -127,20 +94,6 @@ class AdminController extends Controller
         return view('admin-page/update-user-info-form', compact('selected_users_info'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $validatedData  =  $request->validate([
-            'product_name'  => 'required|max:255',
-            'price' => 'required|digits_between:0,2147483646|numeric',
-            'qty' => 'required|digits_between:0,2147483646|numeric',
-            'description' => 'required|max:255'
-        ]);
-
-        $selected_product = Product::find($id);
-        $selected_product->update($request->all());
-        return redirect('/admin/products')->with('success', 'Product successfully updated');
-    }
-
     public function update_user(Request $request, $id)
     {
         $validatedData  =  $request->validate([
@@ -179,12 +132,7 @@ class AdminController extends Controller
         return redirect('/admin/view-stock-orders')->with('success', 'Order status  successfully updated');
     }
 
-    public function delete($id)
-    {
-        $selected_product = Product::find($id);
-        $selected_product->delete($selected_product);
-        return redirect('/admin/products')->with('success', 'Product successfully deleted');
-    }
+
 
     public function delete_product_photo($id)
     {
@@ -219,12 +167,6 @@ class AdminController extends Controller
         $selected_users_info = CustomerInfo::find($id);
         $selected_users_info->delete($selected_users_info);
         return redirect('/admin/users-info')->with('success', 'User\'s Info successfully deleted');
-    }
-
-    public function view_products()
-    {
-        $products = Product::all();
-        return view('/admin-page/view-products', compact('products'));
     }
 
     public function view_products_photo()
