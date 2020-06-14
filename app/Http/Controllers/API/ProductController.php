@@ -13,8 +13,10 @@ class ProductController extends BaseController
 {
     public function index()
     {
-        $products = Product::all();
-        return $this->sendResponse($products->toArray(), 'Products retrieved successfully.');
+        $products = Product::orderBy('created_at', 'DESC')->paginate(8);
+        $countProducts = count($products);
+        // return view('client-page/products', compact('products', 'countProducts'));
+        return $this->sendResponse($products->toArray(), $countProducts, 'Products retrieved successfully.');
     }
 
     public function store(Request $request)
@@ -93,5 +95,28 @@ class ProductController extends BaseController
         $selected_product = Product::find($id);
         $selected_product->delete($selected_product);
         return $this->sendResponse($selected_product->toArray(), 'Product deleted successfully.');
+    }
+
+    public function view_products_by_category($id)
+    {
+        $category_products = Product::where('category_id', '=', $id)->orderBy('created_at', 'DESC')->paginate(8);
+        // return view('client-page/products-category', compact('category_products'));
+        return $this->sendResponse($category_products->toArray(), 'Products by category retrieved successfully.');
+    }
+
+    public function view_product_details(Request $request, $id)
+    {
+        $selected_product = Product::find($id);
+        $category = $selected_product->category;
+        $photos = $selected_product->photos;
+        // return view('client-page/product-details', compact('selected_product', 'category'));
+        return $this->sendResponse($selected_product->toArray(), $category, $photos, 'Products details retrieved successfully.');
+    }
+
+    public function view_product_photos()
+    {
+        $photos = Photos::all();
+        // return view('/admin-page/view-products-photo', compact('photos'));
+        return $this->sendResponse($photos->toArray(), 'Product photos retrieved successfully.');
     }
 }

@@ -6,10 +6,11 @@ use App\Cart;
 use App\CartDetail;
 use App\Product;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\BaseController as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CartController extends Controller
+class CartController extends BaseController
 {
     public function view_cart()
     {
@@ -23,11 +24,14 @@ class CartController extends Controller
             $subTotal = $selectedProductPrice + $subTotal;
         }
 
-        return view('client-page/cart', compact('cartDetail', 'subTotal'));
+        // return view('client-page/cart', compact('cartDetail', 'subTotal'));
+        return $this->sendResponse($cartDetail->toArray(), $subTotal, 'Cart Detail retrieved successfully.');
     }
 
     public function insertProductToCart(Request $request, $id)
     {
+        $status = "success";
+
         $addedProduct = Product::find($id);
         $loggedIn_userId = Auth::user()->id;
         // Selecting 'id' on carts
@@ -35,10 +39,12 @@ class CartController extends Controller
         $cartDetail = CartDetail::where('cart_id', '=', $cart->id)->get();
 
         if ($addedProduct->qty == 0) {
-            return redirect('/cart')->with('success', 'Oops! The product is finished. Please order again next time.');
+            // return redirect('/cart')->with('success', 'Oops! The product is finished. Please order again next time.');
+            return $this->sendResponse($status, 'Cart Detail retrieved successfully.');
         } else if ($request->qty > $addedProduct->qty) {
             $message = 'Oops! The stock is limited. There are ' . $addedProduct->qty . ' left.';
-            return redirect('/cart')->with('success', $message);
+            // return redirect('/cart')->with('success', $message);
+            return $this->sendResponse($status, $message);
         }
 
         // If user created a cart from /products page (instant Cart), then the qty set to 1
@@ -68,7 +74,8 @@ class CartController extends Controller
             $newCartDetail->save();
         }
 
-        return redirect('/cart')->with('success', 'Product successfully added to Cart');
+        // return redirect('/cart')->with('success', 'Product successfully added to Cart');
+        return $this->sendResponse($status, 'Cart Detail retrieved successfully.');
     }
 
     public function productExist($selectedProduct, $product)
@@ -82,6 +89,8 @@ class CartController extends Controller
 
     public function update_cart_details(Request $request, $id)
     {
+        $status = "success";
+
         $loggedIn_userId = Auth::user()->id;
         // Selecting 'id' on carts
         $cart = Cart::select('id')->where('user_id', '=', $loggedIn_userId)->first();
@@ -99,13 +108,17 @@ class CartController extends Controller
                 )
             );
         }
-        return redirect('/cart')->with('success', 'Cart successfully updated');
+        // return redirect('/cart')->with('success', 'Cart successfully updated');
+        return $this->sendResponse($status, 'Cart Detail retrieved successfully.');
     }
 
     public function  delete_cart_details($id)
     {
+        $status = "success";
+
         $selected_item = CartDetail::find($id);
         $selected_item->delete($selected_item);
-        return redirect('/cart')->with('success', 'Product successfully deleted');
+        // return redirect('/cart')->with('success', 'Product successfully deleted');
+        return $this->sendResponse($status, 'Cart Detail retrieved successfully.');
     }
 }

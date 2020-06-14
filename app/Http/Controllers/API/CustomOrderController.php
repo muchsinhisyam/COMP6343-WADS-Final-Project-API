@@ -11,9 +11,10 @@ use Redirect;
 use Illuminate\Support\Facades\Auth;
 use ZipArchive;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\BaseController as BaseController;
 use Illuminate\Http\Request;
 
-class CustomOrderController extends Controller
+class CustomOrderController extends BaseController
 {
     private $order_type = "Custom Order";
 
@@ -21,7 +22,7 @@ class CustomOrderController extends Controller
     {
         $user_id = Auth::user()->id;
 
-        $validatedData  =  $request->validate([
+        $validator = Validator::make($request, [
             'first_name' => 'required|max:255',
             'last_name' => 'required|max:255',
             'email' => 'required',
@@ -60,7 +61,8 @@ class CustomOrderController extends Controller
             $iteration++;
         }
 
-        return redirect('/orders/' . $user_id)->with('success', 'Your order is successfully added');
+        // return redirect('/orders/' . $user_id)->with('success', 'Your order is successfully added');
+        return $this->sendResponse($order_info->toArray(), 'Custom Order successfully added');
     }
 
     public function download_custom_images($id)
@@ -119,42 +121,48 @@ class CustomOrderController extends Controller
     {
         $user = User::find($id);
         $customer_info = $user->customer;
-        return view('client-page/custom-order-form', compact('customer_info'));
+        // return view('client-page/custom-order-form', compact('customer_info'));
+        return $this->sendResponse($customer_info->toArray(), 'Customer Info viewed successfully.');
     }
 
     public function view_custom_orders()
     {
         $custom_orders = Order::where('order_type', '=', 'Custom Order')->with('user')->get();
-        return view('admin-page/view-custom-orders', compact('custom_orders'));
+        // return view('admin-page/view-custom-orders', compact('custom_orders'));
+        return $this->sendResponse($custom_orders->toArray(), 'Custom order viewed successfully.');
     }
 
     public function update_custom_orders(Request $request, $id)
     {
-        Order::where('id', $id)->update(
+        $orders = Order::where('id', $id)->update(
             array(
                 'order_status' => $request->order_status
             )
         );
-        return redirect('/admin/view-custom-orders')->with('success', 'Order status  successfully updated');
+        // return redirect('/admin/view-custom-orders')->with('success', 'Order status  successfully updated');
+        return $this->sendResponse($orders->toArray(), 'Custom order updated successfully');
     }
 
     public function edit_custom_order($id)
     {
         $selected_order = Order::find($id);
-        return view('admin-page/update-custom-order-form', compact('selected_order'));
+        // return view('admin-page/update-custom-order-form', compact('selected_order'));
+        return $this->sendResponse($selected_order->toArray(), 'Custom order viewed successfully');
     }
 
     public function delete_custom_orders($id)
     {
         $selected_order = Order::find($id);
         $selected_order->delete($selected_order);
-        return redirect('/admin/view-custom-orders')->with('success', 'Order successfully deleted');
+        // return redirect('/admin/view-custom-orders')->with('success', 'Order successfully deleted');
+        return $this->sendResponse($selected_order->toArray(), 'Order successfully deleted');
     }
 
     public function view_custom_order_details($id)
     {
         $selected_order = Order::find($id);
         $selected_order_photos = CustomPhotos::where('order_id', '=', $selected_order->id)->get();
-        return view('client-page/custom-order-details', compact('selected_order', 'selected_order_photos'));
+        // return view('client-page/custom-order-details', compact('selected_order', 'selected_order_photos'));
+        return $this->sendResponse($selected_order_photos->toArray(), 'Custom photos viewed successfully');
     }
 }
