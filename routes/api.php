@@ -24,10 +24,11 @@ Route::post('login', 'API\LoginController@login');
 
 // Products Routes
 Route::resource('products', 'API\ProductController');
-Route::get('products/category/{id}', 'API\ProductController@view_products_by_category');
-Route::get('/product-details/{id}', 'API\ProductController@view_product_details');
-Route::get('/admin/products-photo', 'API\ProductController@view_product_photos')
+Route::get('/admin/products-photo', 'API\ProductController@showAllPhotos')
     ->middleware('is_admin');
+Route::get('/products/{id}/photo', 'API\ProductController@showProductPhotos');
+Route::get('/products/{id}/category', 'API\ProductController@showProductCategory');
+Route::get('/products/{id}/color', 'API\ProductController@showProductColor');
 
 // Customer Info Routes
 Route::resource('customer-info', 'API\CustomerInfoController')

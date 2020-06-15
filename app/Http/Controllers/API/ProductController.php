@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Category;
 use \App\Photos;
 use \App\Product;
+use \App\Color;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class ProductController extends BaseController
@@ -69,6 +72,65 @@ class ProductController extends BaseController
         return $this->sendResponse($product->toArray(), 'Product retrieved successfully.');
     }
 
+    public function showProductPhotos($id)
+    {
+        $productPhotos = Photos::where('product_id', '=', $id)->get();
+
+        if (is_null($productPhotos)) {
+            return $this->sendError('Product Photos not found.');
+        }
+
+        return $this->sendResponse($productPhotos->toArray(), 'Product Photos retrieved successfully.');
+    }
+
+    public function showProductCategory($id)
+    {
+        $product = Product::find($id);
+
+        if (is_null($product)) {
+            return $this->sendError('Product not found.');
+        }
+
+        $productCategory = Category::where('id', '=', $product->category_id)->first();
+
+        if (is_null($productCategory)) {
+            return $this->sendError('Product Category not found.');
+        }
+
+        return $this->sendResponse($productCategory->toArray(), 'Product Category retrieved successfully.');
+    }
+
+    public function showProductColor($id)
+    {
+        $product = Product::find($id);
+
+        if (is_null($product)) {
+            return $this->sendError('Product not found.');
+        }
+
+        $productColor = Color::where('id', '=', $product->color_id)->first();
+
+        if (is_null($productColor)) {
+            return $this->sendError('Product Color not found.');
+        }
+
+        return $this->sendResponse($productColor->toArray(), 'Product Color retrieved successfully.');
+    }
+
+    public function showAllPhotos()
+    {
+        $photos = DB::table('photos')
+            ->select('*')
+            ->join('products', 'photos.product_id', '=', 'products.id')
+            ->get();
+
+        if (is_null($photos)) {
+            return $this->sendError('Photos not found.');
+        }
+
+        return $this->sendResponse($photos->toArray(), 'Photos retrieved successfully.');
+    }
+
     public function update(Request $request, $id)
     {
         $selected_product = $request->all();
@@ -95,28 +157,5 @@ class ProductController extends BaseController
         $selected_product = Product::find($id);
         $selected_product->delete($selected_product);
         return $this->sendResponse($selected_product->toArray(), 'Product deleted successfully.');
-    }
-
-    public function view_products_by_category($id)
-    {
-        $category_products = Product::where('category_id', '=', $id)->orderBy('created_at', 'DESC')->paginate(8);
-        // return view('client-page/products-category', compact('category_products'));
-        return $this->sendResponse($category_products->toArray(), 'Products by category retrieved successfully.');
-    }
-
-    public function view_product_details(Request $request, $id)
-    {
-        $selected_product = Product::find($id);
-        $category = $selected_product->category;
-        $photos = $selected_product->photos;
-        // return view('client-page/product-details', compact('selected_product', 'category'));
-        return $this->sendResponse($selected_product->toArray(), $category, $photos, 'Products details retrieved successfully.');
-    }
-
-    public function view_product_photos()
-    {
-        $photos = Photos::all();
-        // return view('/admin-page/view-products-photo', compact('photos'));
-        return $this->sendResponse($photos->toArray(), 'Product photos retrieved successfully.');
     }
 }
