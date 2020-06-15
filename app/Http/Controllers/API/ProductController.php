@@ -41,22 +41,22 @@ class ProductController extends BaseController
         }
 
         $product = Product::create($input);
-        $iteration = 1;
 
-        // if ($request->hasFile('file')) {
-        foreach ($request->file as $file) {
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'ProductID-' . $product->id . '-Image-' . $iteration . '.' . $extension;
-            $path = public_path() . '/images';
-            $file->move($path, $filename);
-            $photo = new \App\Photos;
-            $photo->product_id = $product->id;
-            $photo->image_name = $filename;
-            $photo->save();
+        // $iteration = 1;
+        if ($request->hasFile('file')) {
+            // foreach ($request->file as $file) {
+            //     $extension = $file->getClientOriginalExtension();
+            //     $filename = 'ProductID-' . $product->id . '-Image-' . $iteration . '.' . $extension;
+            //     $path = public_path() . '/images';
+            //     $file->move($path, $filename);
+            //     $photo = new \App\Photos;
+            //     $photo->product_id = $product->id;
+            //     $photo->image_name = $filename;
+            //     $photo->save();
 
-            $iteration++;
+            //     $iteration++;
         }
-        // }
+        // // }
 
         return $this->sendResponse($product->toArray(), 'Product created successfully.');
     }
