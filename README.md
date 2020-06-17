@@ -8,4 +8,4 @@
 </p>
 
 # About This Project
-This is the API repository for the  [(CustomNiture)](http://customniture.me/) web app. For the front-end and back-end repository details, you can click [(here.)](https://github.com/muchsinhisyam/COMP6343-WADS-Final-Project)
+This is the API repository for the  [CustomNiture](http://customniture.me/) web app. For the front-end and back-end repository details, you can click [here.](https://github.com/muchsinhisyam/COMP6343-WADS-Final-Project)
